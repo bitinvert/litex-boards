@@ -39,7 +39,7 @@ _io = [
     ),
 
     # UART
-    ("uart", 0,
+    ("serial", 0,
         Subsignal("tx", Pins("AB15")),
         Subsignal("rx", Pins("AA15")),
         IOStandard("LVCMOS33"),
