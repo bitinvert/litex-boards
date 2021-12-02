@@ -12,7 +12,7 @@ from litex.soc.integration.builder import *
 from litedram.modules import MT41J256M16
 from litedram.phy import s7ddrphy
 
-from liteeth.phy.gmii import *
+from liteeth.phy import LiteEthPHY
 
 class _CRG(Module):
     def __init__(self, platform, sys_clk_freq):
@@ -21,16 +21,15 @@ class _CRG(Module):
         self.clock_domains.cd_sys2x     = ClockDomain(reset_less=True)
         self.clock_domains.cd_idelay    = ClockDomain()
 
-        self.submodules.pll = pll = S7MMC(speedgrade=-2)
+        self.submodules.pll = pll = S7MMCM(speedgrade=-2)
         self.comb += pll.reset.eq(~platform.request("cpu_reset") | self.rst)
-        #TODO fill the function
         pll.register_clkin(platform.request("clk200_p"), 200e6)
         pll.create_clkout(self.cd_sys,    sys_clk_freq)
         pll.create_clkout(self.cd_sys2x,  2*sys_clk_freq)
         pll.create_clkout(self.cd_idelay, 200e6)
         platform.add_false_path_constraints(self.cd_sys.clk, pll.clkin)
 
-        self.submodules.idelayctrl = S7DELAYCTRL(self.cd_idelay)
+        self.submodules.idelayctrl = S7IDELAYCTRL(self.cd_idelay)
 
 
 class BaseSoC(SoCCore):
@@ -50,7 +49,7 @@ class BaseSoC(SoCCore):
         if not self.integrated_main_ram_size:
             self.submodules.ddrphy = s7ddrphy.A7DDRPHY(platform.request("ddram"),
                 memtype = "DDR3",
-                nphase  = 4,
+                nphases  = 4,
                 sys_clk_freq = sys_clk_freq)
             self.add_sdram("sdram",
                 phy           = self.ddrphy,
@@ -59,10 +58,10 @@ class BaseSoC(SoCCore):
             )
         
         # Ethernet -------------------------------------------------------
-        self.submodules.ethphy = LiteEthPHYGMII(
-            clock_pads = self.plaform.request("eth_clocks"),
-            pads       = self.platform.request("eth")
-        )
+        self.submodules.ethphy = LiteEthPHY(
+                clock_pads = self.platform.request("eth_clocks"),
+                pads       = self.platform.request("eth"),
+                clk_freq   = self.clk_freq)
         self.add_ethernet(phy=self.ethphy)
             
 
