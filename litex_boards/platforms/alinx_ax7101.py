@@ -1,0 +1,153 @@
+#
+# This file is part of LiteX-Boards.
+#
+# Copyright (c) 2021 Brendan Christy <brendan.christy@hs-rm.de>
+# SPDX-License-Identifier: BSD-2-Clause
+
+from litex.build.generic_platform import *
+from litex.build.xilinx import XilinxPlatform, VivadoProgrammer
+from litex.build.openocd import OpenOCD
+
+# IOs ----------------------------------------------------------------------------------------------
+
+_io = [
+    # Clk / Rst
+    ("clk200_p", 0, Pins("R4"), IOStandard("DIFF_SSTL15")),
+    ("clk200_n", 0, Pins("T4"), IOStandard("DIFF_SSTL15")),
+    ("clk125_p", 0, Pins("F6"), IOStandard("DIFF_SSTL15")),
+    ("clk125_n", 0, Pins("E6"), IOStandard("DIFF_SSTL15")),
+    ("cpu_reset", 0, Pins("T6"), IOStandard("DIFF_SSTL15")),
+
+    # DDR3 SDRAM
+    ("ddram", 0,
+        Subsignal("a", Pins("AA4 AB2 AA5 AB5 AB1 U3 W1 T1 V2 U2 Y1 W2 Y2 U1 V3"), IOStandard("SSTL15")),
+        Subsignal("ba", Pins("AA3 Y3 Y4"), IOStandard("SSTL15")),
+        Subsignal("ras_n", Pins("V4"), IOStandard("SSTL15")),
+        Subsignal("cas_n", Pins("W4"), IOStandard("SSTL15")),
+        Subsignal("we_n", Pins("AA1"), IOStandard("SSTL15")),
+        Subsignal("dm", Pins("D2 G2 M2 M5"), IOStandard("SSTL15")),
+        Subsignal("dq", Pins("C2 G1 A1 F3 B2 F1 B1 E2 H3 G3 H2 H5 J1 J5 K1 H4 L4 M3 L3 J6 K3 K6 J4 L5 P1 N4 R1 N2 M6 N5 P6 P2"), IOStandard("SSTL15"), Misc("IN_TERM=UNTUNED_SPLIT_50")),
+        Subsignal("dqs_p", Pins("E1 K2 M1 P5"), IOStandard("DIFF_SSTL15")),
+        Subsignal("dqs_n", Pins("D1 J2 L1 P4"), IOStandard("DIFF_SSTL15")),
+        Subsignal("clk_p", Pins("R3"), IOStandard("DIFF_SSTL15")),
+        Subsignal("clk_n", Pins("R2"), IOStandard("DIFF_SSTL15")),
+        Subsignal("cke", Pins("T5"), IOStandard("SSTL15")),
+        Subsignal("odt", Pins("U5"), IOStandard("SSTL15")),
+        Subsignal("cs_n", Pins("AB3"), IOStandard("SSTL15")),
+        Subsignal("rst_n", Pins("W6"), IOStandard("LVCMOS15")),
+        Misc("SLEW=FAST"),
+    ),
+
+    # UART
+    ("uart", 0,
+        Subsignal("tx", Pins("AB15")),
+        Subsignal("rx", Pins("AA15")),
+        IOStandard("LVCMOS33"),
+    ),
+
+    # GMII Ethernet
+    ("eth_clocks", 0,
+        Subsignal("gtx", Pins("G21")),
+        Subsignal("tx", Pins("K21")),
+        Subsignal("rx", Pins("K18")),
+        IOStandard("LVCMOS33")
+    ),
+    ("eth_clocks", 1,
+        Subsignal("gtx", Pins("M16")),
+        Subsignal("tx", Pins("T14")),
+        Subsignal("rx", Pins("J20")),
+        IOStandard("LVCMOS33")
+    ),
+    ("eth_clocks", 2,
+        Subsignal("gtx", Pins("AA21")),
+        Subsignal("tx", Pins("V10")),
+        Subsignal("rx", Pins("V13")),
+        IOStandard("LVCMOS33")
+    ),
+    ("eth_clocks", 3,
+        Subsignal("gtx", Pins("P20")),
+        Subsignal("tx", Pins("U16")),
+        Subsignal("rx", Pins("Y18")),
+        IOStandard("LVCMOS33")
+    ),
+    ("eth", 0,
+        Subsignal("tx_data", Pins("D22 H20 H22 J22 K22 L19 K19 L20")),
+        Subsignal("tx_en",   Pins("G22")),
+        Subsignal("tx_er",   Pins("K17")),
+        Subsignal("rx_dv",   Pins("M22")),
+        Subsignal("rx_er",   Pins("N18")),
+        Subsignal("rx_data", Pins("N22 H18 H17 M21 L21 N20 M20 L19")),
+        Subsignal("col_dv",  Pins("M18")),
+        Subsignal("crs_dv",  Pins("L18")),
+        Subsignal("rst_n",   Pins("G20")),
+        Subsignal("mdc",     Pins("J17")),
+        Subsignal("mdio",    Pins("L16")),
+        IOStandard("LVCMOS33")
+    ),
+    ("eth", 1,
+        Subsignal("tx_data", Pins("L15 K16 W15 W16 V17 W17 U15 V15")),
+        Subsignal("tx_en",   Pins("M15")),
+        Subsignal("tx_er",   Pins("T15")),
+        Subsignal("rx_dv",   Pins("L13")),
+        Subsignal("rx_er",   Pins("G13")),
+        Subsignal("rx_data", Pins("M13 K14 K13 J14 H14 H15 J15 H13")),
+        Subsignal("col_dv",  Pins("J11")),
+        Subsignal("crs_dv",  Pins("E22")),
+        Subsignal("rst_n",   Pins("L14")),
+        Subsignal("mdc",     Pins("AB21")),
+        Subsignal("mdio",    Pins("AB22")),
+        IOStandard("LVCMOS33")
+    ),
+    ("eth", 2,
+        Subsignal("tx_data", Pins("W11 W12 Y11 Y12 W10 AA11 AA10 AB10")),
+        Subsignal("tx_en",   Pins("V14")),
+        Subsignal("tx_er",   Pins("AA9")),
+        Subsignal("rx_dv",   Pins("AA20")),
+        Subsignal("rx_er",   Pins("U21")),
+        Subsignal("rx_data", Pins("AB20 AA19 AA18 AB18 Y17 W22 W21 T21")),
+        Subsignal("col_dv",  Pins("Y21")),
+        Subsignal("crs_dv",  Pins("Y22")),
+        Subsignal("rst_n",   Pins("T20")),
+        Subsignal("mdc",     Pins("V20")),
+        Subsignal("mdio",    Pins("V19")),
+        IOStandard("LVCMOS33")
+    ),
+    ("eth", 3,
+        Subsignal("tx_data", Pins("R17 P15 N17 P17 T16 U17 U18 P19")),
+        Subsignal("tx_en",   Pins("P16")),
+        Subsignal("tx_er",   Pins("R19")),
+        Subsignal("rx_dv",   Pins("W20")),
+        Subsignal("rx_er",   Pins("N13")),
+        Subsignal("rx_data", Pins("W19 Y10 V22 U22 T18 R18 R14 P14")),
+        Subsignal("col_dv",  Pins("N14")),
+        Subsignal("crs_dv",  Pins("N15")),
+        Subsignal("rst_n",   Pins("R16")),
+        Subsignal("mdc",     Pins("V18")),
+        Subsignal("mdio",    Pins("U20")),
+        IOStandard("LVCMOS33")
+    ),
+]
+
+# TODO add SCCard support
+
+_connectors = []
+
+class Platform(XilinxPlatform):
+    default_clk_name   = "clk200_p"
+    default_clk_period = 1e9/200e6
+
+    def __init__(self) -> None:
+        XilinxPlatform.__init__(self, "xc7a100t-fgg484-2", _io, _connectors, toolchain="vivado")
+        self.add_platform_command("set_property INTERNAL_VREF 0.750 [get_iobanks 34]")
+
+
+    def create_programmer(self):
+        return OpenOCD("openocd_ax7101.cfg", "bscan_spi_xc7a100t.bit")
+
+    def do_finalize(self, fragment):
+        XilinxPlatform.do_finalize(self, fragment)
+        self.add_period_constraint(self.lookup_request("clk200_p",        loose=True), 1e9/200e6)
+        
+        self.add_period_constraint(self.lookup_request("eth_clocks:gtx", loose=True), 1e9/125e6)
+        self.add_period_constraint(self.lookup_request("eth_clocks:tx", loose=True), 1e9/125e6)
+        self.add_period_constraint(self.lookup_request("eth_clocks:rx", loose=True), 1e9/125e6)
