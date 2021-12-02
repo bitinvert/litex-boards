@@ -34,7 +34,7 @@ class _CRG(Module):
 
 
 class BaseSoC(SoCCore):
-    def __init__(self, sys_clk_freq, **kwargs):
+    def __init__(self, sys_clk_freq=int(200e6), **kwargs):
         platform = alinx_ax7101.Platform()
 
         # SoCCore ---------------------------------------------------------
