@@ -12,10 +12,14 @@ from litex.build.openocd import OpenOCD
 
 _io = [
     # Clk / Rst
-    ("clk200_p", 0, Pins("R4"), IOStandard("SSTL15")),
-    ("clk200_n", 0, Pins("T4"), IOStandard("DIFF_SSTL15")),
-    ("clk125_p", 0, Pins("F6"), IOStandard("DIFF_SSTL15")),
-    ("clk125_n", 0, Pins("E6"), IOStandard("DIFF_SSTL15")),
+    ("clk200", 0,
+        Subsignal("p", Pins("R4"), IOStandard("DIFF_SSTL15")),
+        Subsignal("n", Pins("T4"), IOStandard("DIFF_SSTL15"))
+    ),
+    ("clk125", 0,
+        Subsignal("p", Pins("F6"), IOStandard("DIFF_SSTL15")),
+        Subsignal("n", Pins("E6"), IOStandard("DIFF_SSTL15"))
+    ),
     ("cpu_reset", 0, Pins("T6"), IOStandard("SSTL15")),
 
     # DDR3 SDRAM
@@ -27,14 +31,14 @@ _io = [
         Subsignal("we_n", Pins("AA1"), IOStandard("SSTL15")),
         Subsignal("dm", Pins("D2 G2 M2 M5"), IOStandard("SSTL15")),
         Subsignal("dq", Pins("C2 G1 A1 F3 B2 F1 B1 E2 H3 G3 H2 H5 J1 J5 K1 H4 L4 M3 L3 J6 K3 K6 J4 L5 P1 N4 R1 N2 M6 N5 P6 P2"), IOStandard("SSTL15"), Misc("IN_TERM=UNTUNED_SPLIT_50")),
-        Subsignal("dqs_p", Pins("E1 K2 M1 P5"), IOStandard("DIFF_SSTL15")),
-        Subsignal("dqs_n", Pins("D1 J2 L1 P4"), IOStandard("DIFF_SSTL15")),
+        Subsignal("dqs_p", Pins("E1 K2 M1 P5"), IOStandard("DIFF_SSTL15"), Misc("IN_TERM=UNTUNED_SPLIT_50")),
+        Subsignal("dqs_n", Pins("D1 J2 L1 P4"), IOStandard("DIFF_SSTL15"), Misc("IN_TERM=UNTUNED_SPLIT_50")),
         Subsignal("clk_p", Pins("R3"), IOStandard("DIFF_SSTL15")),
         Subsignal("clk_n", Pins("R2"), IOStandard("DIFF_SSTL15")),
         Subsignal("cke", Pins("T5"), IOStandard("SSTL15")),
         Subsignal("odt", Pins("U5"), IOStandard("SSTL15")),
         Subsignal("cs_n", Pins("AB3"), IOStandard("SSTL15")),
-        Subsignal("rst_n", Pins("W6"), IOStandard("LVCMOS15")),
+        Subsignal("reset_n", Pins("W6"), IOStandard("LVCMOS15")),
         Misc("SLEW=FAST"),
     ),
 
@@ -133,12 +137,13 @@ _io = [
 _connectors = []
 
 class Platform(XilinxPlatform):
-    default_clk_name   = "clk200_p"
+    default_clk_name   = "clk200"
     default_clk_period = 1e9/200e6
 
     def __init__(self) -> None:
         XilinxPlatform.__init__(self, "xc7a100t-fgg484-2", _io, _connectors, toolchain="vivado")
         self.add_platform_command("set_property INTERNAL_VREF 0.750 [get_iobanks 34]")
+        self.add_platform_command("set_property INTERNAL_VREF 0.750 [get_iobanks 35]")
 
 
     def create_programmer(self):
@@ -146,7 +151,7 @@ class Platform(XilinxPlatform):
 
     def do_finalize(self, fragment):
         XilinxPlatform.do_finalize(self, fragment)
-        self.add_period_constraint(self.lookup_request("clk200_p",        loose=True), 1e9/200e6)
+        self.add_period_constraint(self.lookup_request("clk200",        loose=True), 1e9/200e6)
         
         self.add_period_constraint(self.lookup_request("eth_clocks:gtx", loose=True), 1e9/125e6)
         self.add_period_constraint(self.lookup_request("eth_clocks:tx", loose=True), 1e9/125e6)

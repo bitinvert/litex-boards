@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import os
 import argparse
 from migen import *
@@ -24,7 +26,7 @@ class _CRG(Module):
 
         self.submodules.pll = pll = S7MMCM(speedgrade=-2)
         self.comb += pll.reset.eq(~platform.request("cpu_reset") | self.rst)
-        pll.register_clkin(platform.request("clk200_p"), 200e6)
+        pll.register_clkin(platform.request("clk200"), 200e6)
         pll.create_clkout(self.cd_sys,    sys_clk_freq)
         pll.create_clkout(self.cd_sys4x,  4*sys_clk_freq)
         pll.create_clkout(self.cd_sys4x_dqs, 4*sys_clk_freq, phase=90)
@@ -35,7 +37,7 @@ class _CRG(Module):
 
 
 class BaseSoC(SoCCore):
-    def __init__(self, sys_clk_freq=int(200e6), **kwargs):
+    def __init__(self, sys_clk_freq=int(100e6), **kwargs):
         platform = alinx_ax7101.Platform()
 
         # SoCCore ---------------------------------------------------------
@@ -71,7 +73,7 @@ def main():
     parser = argparse.ArgumentParser(description="LiteX SoC on Alinx AX7101")
     parser.add_argument("--build", action="store_true", help="Build Bitstream")
     parser.add_argument("--load", action="store_true", help="Load Bitstream")
-    parser.add_argument("--sys-clk-freq", default=200e6, help="System clock frequency (default: 200MHz)")
+    parser.add_argument("--sys-clk-freq", default=100e6, help="System clock frequency (default: 100MHz)")
     
     #TODO Add SDCard support
     """
