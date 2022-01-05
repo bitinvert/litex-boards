@@ -14,7 +14,7 @@ from litex.soc.integration.builder import *
 from litedram.modules import MT41J256M16
 from litedram.phy import s7ddrphy
 
-from liteeth.phy import LiteEthPHY
+from liteeth.phy import LiteEthPHYGMII
 
 class _CRG(Module):
     def __init__(self, platform, sys_clk_freq):
@@ -33,7 +33,7 @@ class _CRG(Module):
         pll.create_clkout(self.cd_idelay, 200e6)
         platform.add_false_path_constraints(self.cd_sys.clk, pll.clkin)
 
-        self.submodules.idelayctrl = S7IDELAYCTRL(self.cd_idelay)
+        self.submodules.idelayctrl = S7IDELAYCTRL(self.cd_idelay)        
 
 
 class BaseSoC(SoCCore):
@@ -47,6 +47,11 @@ class BaseSoC(SoCCore):
                          **kwargs)
 
         # CRG -------------------------------------------------------------
+        eth0_clock = platform.request("eth_clocks_ext", 0)
+        eth1_clock = platform.request("eth_clocks_ext", 1)
+        eth2_clock = platform.request("eth_clocks_ext", 2)
+        eth3_clock = platform.request("eth_clocks_ext", 3)
+
         self.submodules.crg = _CRG(platform, sys_clk_freq) 
 
         # DDR3 SDRAM ------------------------------------------------------
@@ -62,11 +67,33 @@ class BaseSoC(SoCCore):
             )
         
         # Ethernet -------------------------------------------------------
-        self.submodules.ethphy = LiteEthPHY(
-                clock_pads = self.platform.request("eth_clocks"),
-                pads       = self.platform.request("eth"),
-                clk_freq   = self.clk_freq)
-        self.add_ethernet(phy=self.ethphy)
+        self.submodules.ethphy = LiteEthPHYGMII(
+                clock_pads = eth0_clock,
+                pads       = self.platform.request("eth", 0)
+                )
+        self.add_csr("ethphy")
+        self.add_ethernet(name="ethmac", phy=self.ethphy, phy_cd="ethphy_eth")
+
+        self.submodules.ethphy1 = LiteEthPHYGMII(
+                clock_pads = eth1_clock,
+                pads       = self.platform.request("eth", 1)
+                )
+        self.add_csr("ethphy1")
+        self.add_ethernet(name="ethmac1", phy=self.ethphy1, phy_cd="ethphy1_eth")
+        
+        self.submodules.ethphy2 = LiteEthPHYGMII(
+                clock_pads = eth2_clock,
+                pads       = self.platform.request("eth", 2)
+                )
+        self.add_csr("ethphy2")
+        self.add_ethernet(name="ethmac2", phy=self.ethphy2, phy_cd="ethphy2_eth")
+
+        self.submodules.ethphy3 = LiteEthPHYGMII(
+                clock_pads = eth3_clock,
+                pads       = self.platform.request("eth", 3)
+                )
+        self.add_csr("ethphy3")
+        self.add_ethernet(name="ethmac3", phy=self.ethphy3, phy_cd="ethphy3_eth")
             
 
 def main():
