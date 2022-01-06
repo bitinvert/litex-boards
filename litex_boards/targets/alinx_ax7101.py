@@ -48,9 +48,9 @@ class BaseSoC(SoCCore):
 
         # CRG -------------------------------------------------------------
         eth0_clock = platform.request("eth_clocks_ext", 0)
-        eth1_clock = platform.request("eth_clocks_ext", 1)
-        eth2_clock = platform.request("eth_clocks_ext", 2)
-        eth3_clock = platform.request("eth_clocks_ext", 3)
+        eth1_clock = platform.request("eth1_clocks_ext", 0)
+        eth2_clock = platform.request("eth2_clocks_ext", 0)
+        eth3_clock = platform.request("eth3_clocks_ext", 0)
 
         self.submodules.crg = _CRG(platform, sys_clk_freq) 
 
