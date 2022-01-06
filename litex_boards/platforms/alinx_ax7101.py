@@ -56,19 +56,19 @@ _io = [
         Subsignal("rx", Pins("K18")),
         IOStandard("LVCMOS33")
     ),
-    ("eth_clocks_ext", 1,
+    ("eth1_clocks_ext", 0,
         Subsignal("tx", Pins("T14")),
         Subsignal("gtx", Pins("M16")),
         Subsignal("rx", Pins("J20")),
         IOStandard("LVCMOS33")
     ),
-    ("eth_clocks_ext", 2,
+    ("eth2_clocks_ext", 0,
         Subsignal("tx", Pins("V10")),
         Subsignal("gtx", Pins("AA21")),
         Subsignal("rx", Pins("V13")),
         IOStandard("LVCMOS33")
     ),
-    ("eth_clocks_ext", 3,
+    ("eth3_clocks_ext", 0,
         Subsignal("tx", Pins("U16")),
         Subsignal("gtx", Pins("P20")),
         Subsignal("rx", Pins("Y18")),
@@ -121,7 +121,7 @@ _io = [
     ),
     ("eth", 3,
         Subsignal("rst_n",   Pins("R16")),
-        Subsignal("int_n",   Pins("F13"), Misc("KEEPER = TRUE")),
+        Subsignal("int_n",   Pins("F13")),
         Subsignal("mdc",     Pins("V18")),
         Subsignal("mdio",    Pins("U20")),
         Subsignal("rx_dv",   Pins("W20")),
@@ -157,6 +157,15 @@ class Platform(XilinxPlatform):
         XilinxPlatform.do_finalize(self, fragment)
         self.add_period_constraint(self.lookup_request("clk200",        loose=True), 1e9/200e6)
         
-        self.add_period_constraint(self.lookup_request("eth_clocks:gtx", loose=True), 1e9/125e6)
-        self.add_period_constraint(self.lookup_request("eth_clocks:tx", loose=True), 1e9/125e6)
-        self.add_period_constraint(self.lookup_request("eth_clocks:rx", loose=True), 1e9/125e6)
+        self.add_period_constraint(self.lookup_request("eth_clocks_ext:gtx", loose=True), 1e9/125e6)
+        self.add_period_constraint(self.lookup_request("eth_clocks_ext:tx", loose=True), 1e9/125e6)
+        self.add_period_constraint(self.lookup_request("eth_clocks_ext:rx", loose=True), 1e9/125e6)
+        self.add_period_constraint(self.lookup_request("eth1_clocks_ext:gtx", loose=True), 1e9/125e6)
+        self.add_period_constraint(self.lookup_request("eth1_clocks_ext:tx", loose=True), 1e9/125e6)
+        self.add_period_constraint(self.lookup_request("eth1_clocks_ext:rx", loose=True), 1e9/125e6)
+        self.add_period_constraint(self.lookup_request("eth2_clocks_ext:gtx", loose=True), 1e9/125e6)
+        self.add_period_constraint(self.lookup_request("eth2_clocks_ext:tx", loose=True), 1e9/125e6)
+        self.add_period_constraint(self.lookup_request("eth2_clocks_ext:rx", loose=True), 1e9/125e6)
+        self.add_period_constraint(self.lookup_request("eth3_clocks_ext:gtx", loose=True), 1e9/125e6)
+        self.add_period_constraint(self.lookup_request("eth3_clocks_ext:tx", loose=True), 1e9/125e6)
+        self.add_period_constraint(self.lookup_request("eth3_clocks_ext:rx", loose=True), 1e9/125e6)
