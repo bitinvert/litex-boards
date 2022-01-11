@@ -102,12 +102,9 @@ def main():
     parser.add_argument("--load", action="store_true", help="Load Bitstream")
     parser.add_argument("--sys-clk-freq", default=100e6, help="System clock frequency (default: 100MHz)")
     
-    #TODO Add SDCard support
-    """
     sdopts = parser.add_mutually_exclusive_group()
     sdopts.add_argument("--with-spi-sdcard", action="store_true", help="Enable SPI-mode SDCard support")
     sdopts.add_argument("--with-sdcard", action="store_true", help="Enable SDCard support")
-    """
     
     builder_args(parser)
     soc_core_args(parser)
@@ -118,13 +115,10 @@ def main():
         **soc_core_argdict(args)
     )
 
-    #TODO SDCard support
-    """
     if args.with_spi_sdcard:
         soc.add_spi_sdcard()
     if args.with_sdcard:
         soc.add_sdcard()
-    """
 
     builder = Builder(soc, **builder_argdict(args))
     builder.build(run=args.build)

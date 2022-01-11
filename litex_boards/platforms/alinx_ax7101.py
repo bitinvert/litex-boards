@@ -134,11 +134,28 @@ _io = [
         Subsignal("crs",  Pins("N15")),
         IOStandard("LVCMOS33")
     ),
+    ("spisdcard", 0,
+            Subsignal("clk", Pins("J16")),
+            Subsignal("mosi", Pins("A20"), Misc("PULLUP true")),
+            Subsignal("cs_n", Pins("B22"), Misc("PULLUP true")),
+            Subsignal("miso", Pins("F20"), Misc("PULLUP true")),
+            Misc("SLEW=FAST"),
+            IOStandard("LVCMOS33"),
+        ),
+        ("sdcard", 0,
+            Subsignal("data", Pins("F20 C22 B20 B22"), Misc("PULLUP true")),
+            Subsignal("cmd", Pins("A20"), Misc("PULLUP true")),
+            Subsignal("clk", Pins("J16")),
+            Subsignal("cd", Pins("F19")),
+            Misc("SLEW=FAST"),
+            IOStandard("LVCMOS33"),
+        )
+    
 ]
 
-# TODO add SCCard support
 
 _connectors = []
+
 
 class Platform(XilinxPlatform):
     default_clk_name   = "clk200"
