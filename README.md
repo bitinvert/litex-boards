@@ -17,17 +17,17 @@ Support for the SDCard PMOD has been added for the Alinx AX7101
 
 ![alt text](./doc/sdcardpins.jpg)
 
-| PMod  | Pin    |
+| PMod (Pin) | Pin    |
 |-------|--------|
-| CLK   | 9      |
-| MOSI  | 5      |
-| MISO  | 7      |
-| CS_N  | 3      |
-| DATA1 | 4      |
-| DATA2 | 6      |
-| CD    | 8      |
-| GND   | 37, 38 |
-| 3V3   | 39, 40 |
+| CLK (4) | 9      |
+| MOSI (2) | 5      |
+| MISO (3) | 7      |
+| CS_N (1) | 3      |
+| DATA1 (7) | 4      |
+| DATA2 (8) | 6      |
+| CD  (9)  | 8      |
+| GND  (5, 11) | 37, 38 |
+| 3V3  (6, 12) | 39, 40 |
 
 This is its current pin assignment
 
