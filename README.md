@@ -10,6 +10,28 @@
 
 [![](https://github.com/litex-hub/litex-boards/workflows/ci/badge.svg)](https://github.com/litex-hub/litex-boards/actions) ![License](https://img.shields.io/badge/License-BSD%202--Clause-orange.svg)
 
+
+# NEW FILES
+
+Support for the SDCard PMOD has been added for the Alinx AX7101
+
+![alt text](./doc/sdcardpins.jpg)
+
+| PMod  | Pin    |
+|-------|--------|
+| CLK   | 9      |
+| MOSI  | 5      |
+| MISO  | 7      |
+| CS_N  | 3      |
+| DATA1 | 4      |
+| DATA2 | 6      |
+| CD    | 8      |
+| GND   | 37, 38 |
+| 3V3   | 39, 40 |
+
+This is its current pin assignment
+
+
 [> Intro
 --------
 <figure>
